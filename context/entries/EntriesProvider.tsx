@@ -1,56 +1,51 @@
-import React, { FC, PropsWithChildren, useReducer } from "react";
+import React, { FC, PropsWithChildren, useEffect, useReducer } from "react";
 import { Entry } from "../../interfaces";
 import { entriesReducer, EntriesContext } from "./";
-
-import { v4 as uuidv4 } from "uuid";
+import { entriesApi } from "../../apis";
 
 export interface EntriesState {
   entries: Entry[];
 }
 
 const Entries_INITAL_STATE: EntriesState = {
-  entries: [
-    {
-      _id: uuidv4(),
-      description:
-        "Pendiente: Lorem ipsum, dolor sit amet consectetur adipisicing elit. Expedita dolor totam sed, quae quis facilis quas officia facere voluptatibus, corrupti debitis. Optio itaque distinctio esse quo ea sunt officia rerum!",
-      status: "pending",
-      createdAt: Date.now(),
-    },
-    {
-      _id: uuidv4(),
-      description:
-        "En-Progreso: Lorem ipsum, dolor sit amet consectetur adipisicing elit. Expedita dolor totam sed, quae quis facilis quas officia facere voluptatibus, corrupti debitis. Optio itaque distinctio esse quo ea sunt officia rerum!",
-      status: "in-progres",
-      createdAt: Date.now() - 1000000,
-    },
-    {
-      _id: uuidv4(),
-      description:
-        "Terminada: Lorem ipsum, dolor sit amet consectetur adipisicing elit. Expedita dolor totam sed, quae quis facilis quas officia facere voluptatibus, corrupti debitis. Optio itaque distinctio esse quo ea sunt officia rerum!",
-      status: "finished",
-      createdAt: Date.now() - 100000,
-    },
-  ],
+  entries: [],
 };
 
 export const EntriesProvider: FC<PropsWithChildren> = ({ children }) => {
   const [state, dispatch] = useReducer(entriesReducer, Entries_INITAL_STATE);
 
-  const addNewEntry = (description: string) => {
-    const newEntry: Entry = {
-      _id: uuidv4(),
-      description,
-      createdAt: Date.now(),
-      status: "pending",
-    };
+  const addNewEntry = async (description: string) => {
+    // const newEntry: Entry = {
+    //   // _id: uuidv4(),
+    //   // description,
+    //   // createdAt: Date.now(),
+    //   // status: "pending",
+    // };
+    const { data } = await entriesApi.post<Entry>("/entries", { description });
 
-    dispatch({ type: "ENTRY_ADD", payload: newEntry });
+    dispatch({ type: "ENTRY_ADD", payload: data });
   };
 
-  const updateEntry = (entry: Entry) => {
-    dispatch({ type: "ENTRY_UPDATE_STATE", payload: entry });
+  const updateEntry = async ({ _id, description, status }: Entry) => {
+    try {
+      const { data } = await entriesApi.put<Entry>(`/entries/${_id}`, {
+        description,
+        status,
+      });
+      dispatch({ type: "ENTRY_UPDATE_STATE", payload: data });
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  const refreshEntries = async () => {
+    const { data } = await entriesApi.get<Entry[]>("/entries");
+    dispatch({ type: "ENTRY_REFRESH_DATA", payload: data });
+  };
+
+  useEffect(() => {
+    refreshEntries();
+  }, []);
 
   return (
     <EntriesContext.Provider value={{ ...state, addNewEntry, updateEntry }}>
