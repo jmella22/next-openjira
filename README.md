@@ -1,6 +1,8 @@
 # Next.js OpenJira App
 
-Para correr localmente, se necesita la base de datos
+Los pasos para levantar el proyecto OpenJira en desarrollo usando docker, mongodb y nextjs:
+
+## Levantar la base de datos
 
 ```
 docker-compose up -d
@@ -8,19 +10,26 @@ docker-compose up -d
 
 - El -d, significa **detache**
 
+## Configurar las variables de entrono
+
+- Renombrar el archivo **.env.templante** a **.env**
+
 - MOngoDB URL Local:
 
 ```
 mongodb://localhost:27017/entriesdb
 ```
 
-## Configurar las variables de entrono
+## Reconstruir los modulos de Node y levantar Nextjs
 
-Renombrar el archivo **.env.templante** a **.env**
+```
+npm install
+npm run dev
+```
 
-##Llenar la base de datos de informacion de prueba
+## Llenar la base de datos de informacion de prueba
 
-llamar a:
+- llamar a:
 
 ```
 http://localhost:3000/api/seed
