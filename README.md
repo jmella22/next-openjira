@@ -34,3 +34,9 @@ npm run dev
 ```
 http://localhost:3000/api/seed
 ```
+
+## Imagenes de la App
+
+<img src="./imgs/oo1.png" alt="home de App OpenJira creda con Nextjs"/>
+<img src="./imgs/002.png" alt="detalle de la entrada de App OpenJira creda con Nextjs"/>
+<img src="./imgs/003.png" alt="menu lateral de App OpenJira creda con Nextjs"/>
